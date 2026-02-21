@@ -14,4 +14,4 @@ https://raw.githubusercontent.com/AnatolyTrenev/JSFX/master/index.xml
 - Wilder (comming soon)
 
 ## License
-GPL-3.0-or-later
+GPL-3.0-only
