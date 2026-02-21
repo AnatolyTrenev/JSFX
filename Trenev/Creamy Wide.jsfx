@@ -2,8 +2,6 @@ version: 1.0.0
 desc:Creamy Wide
 author:Anatoly Trenev
 changelog:release
-// @provides
-//   [effect] Creamy Wide.jsfx
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (c) 2026 Anatoly Trenev
 // Source: https://github.com/AnatolyTrenev/JSFX
