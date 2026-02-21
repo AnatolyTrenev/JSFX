@@ -1,6 +1,12 @@
-desc: WILDER 1.4 (by Trenev)
-version: 1.4
-author: ANATOLY TRENEV
+version: 0.5.0
+desc:WILDER
+author:Anatoly Trenev
+changelog:beta
+// @provides
+//   [effect] WILDER.jsfx
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (c) 2026 Anatoly Trenev
+// Source: https://github.com/AnatolyTrenev/JSFX
 options:no_meter
 
 // --- SLIDERS ---
