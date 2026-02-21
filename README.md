@@ -4,7 +4,7 @@ Installation (via ReaPack)
 2. Extensions → ReaPack → Import repositories
 3. Paste this URL:
 
-https://raw.githubusercontent.com/AnatolyTrenev/JSFX/master/index.xml
+https://github.com/AnatolyTrenev/JSFX/raw/master/index.xml
 
 4. Synchronize packages
 5. Install **Creamy Wide**
