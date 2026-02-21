@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <index version="1" name="Trenev" commit="9440e8779f88db2a2927b6c12909e3cb2062062f">
-  <category name="JSFX">
-    <reapack name="Creamy Wide.jsfx" type="effect" desc="Creamy Wide">
-      <version name="1.0.0" author="Anatoly Trenev" time="2026-02-21T11:41:35Z">
-        <changelog><![CDATA[release]]></changelog>
-        <source>https://github.com/AnatolyTrenev/JSFX/raw/1d85fe3cd77a4325d5a06afd40aab394a8247f31/Trenev/Creamy%20Wide.jsfx</source>
-      </version>
-    </reapack>
-  </category>
   <category name="Trenev">
     <reapack name="Creamy Wide.jsfx" type="effect" desc="Creamy Wide">
       <version name="1.0.0" author="Anatoly Trenev" time="2026-02-21T14:54:17Z">
