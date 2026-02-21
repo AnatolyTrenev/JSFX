@@ -4,7 +4,7 @@
     <reapack name="Creamy Wide.jsfx" type="effect" desc="Creamy Wide">
       <version name="1.0.0" author="Anatoly Trenev" time="2026-02-21T11:41:35Z">
         <changelog><![CDATA[release]]></changelog>
-        <source>https://github.com/AnatolyTrenev/Effects/raw/1d85fe3cd77a4325d5a06afd40aab394a8247f31/Effects/Trenev/Creamy%20Wide.jsfx</source>
+        <source>https://github.com/AnatolyTrenev/JSFX/raw/1d85fe3cd77a4325d5a06afd40aab394a8247f31/Effects/Trenev/Creamy%20Wide.jsfx</source>
       </version>
     </reapack>
   </category>
