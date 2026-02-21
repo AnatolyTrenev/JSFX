@@ -1,7 +1,7 @@
-@desc:Creamy Wide
-@author:Anatoly Trenev
-@version:1.0.0
-@changelog: release
+version: 1.0.0
+desc:Creamy Wide
+author:Anatoly Trenev
+changelog:release
 
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (c) 2026 Anatoly Trenev
