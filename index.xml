@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Trenev" commit="eb9697a020e3eba01170552019d61123fe7f0dba">
+<index version="1" name="Trenev" commit="a6894f573519fadcfb54851b4a4ff3d98ec1402e">
   <category name="">
     <reapack name="Creamy Wide.jsfx" type="effect" desc="Creamy Wide">
       <version name="1.0.0" author="Anatoly Trenev" time="2026-02-21T11:41:35Z">
         <changelog><![CDATA[release]]></changelog>
         <source>https://github.com/AnatolyTrenev/JSFX/raw/1d85fe3cd77a4325d5a06afd40aab394a8247f31/Effects/Trenev/Creamy%20Wide.jsfx</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="Trenev">
+    <reapack name="Creamy Wide.jsfx" type="effect" desc="Creamy Wide">
+      <version name="1.0.0" author="Anatoly Trenev" time="2026-02-21T14:54:17Z">
+        <changelog><![CDATA[release]]></changelog>
+        <source>https://github.com/AnatolyTrenev/JSFX/raw/73368a1e80537a061e418ee2e5cecb33970c4f9c/Trenev/Creamy%20Wide.jsfx</source>
       </version>
     </reapack>
   </category>
