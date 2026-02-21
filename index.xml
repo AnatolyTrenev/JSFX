@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <index version="1" name="Trenev" commit="a6894f573519fadcfb54851b4a4ff3d98ec1402e">
-  <category name="Trenev">
+  <category name="JSFX">
     <reapack name="Creamy Wide.jsfx" type="effect" desc="Creamy Wide">
       <version name="1.0.0" author="Anatoly Trenev" time="2026-02-21T11:41:35Z">
         <changelog><![CDATA[release]]></changelog>
