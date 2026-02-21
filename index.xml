@@ -31,7 +31,7 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab Open REAPER\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab Extensions \u8594 ? ReaPack \u8594 ? Import repositories\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab Paste this URL:\sa180\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 https://raw.githubusercontent.com/AnatolyTrenev/JSFX/master/index.xml\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 https://github.com/AnatolyTrenev/JSFX/raw/master/index.xml\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 4.\tx360\tab Synchronize packages\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 5.\tx360\tab Install {\b Creamy Wide}\sa180\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 The plugin will appear in: Effects / Trenev /\par}
