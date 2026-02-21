@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Trenev" commit="3bcc73bfeda1b414ccc6b32287941d0e9dd160bb">
+<index version="1" name="Trenev" commit="9440e8779f88db2a2927b6c12909e3cb2062062f">
   <category name="JSFX">
     <reapack name="Creamy Wide.jsfx" type="effect" desc="Creamy Wide">
       <version name="1.0.0" author="Anatoly Trenev" time="2026-02-21T11:41:35Z">
@@ -15,9 +15,10 @@
         <source>https://github.com/AnatolyTrenev/JSFX/raw/73368a1e80537a061e418ee2e5cecb33970c4f9c/Trenev/Creamy%20Wide.jsfx</source>
       </version>
     </reapack>
-    <reapack name="WILDER 1.3 (beta).txt" type="midinotenames" desc="WILDER 1.4 (by Trenev)">
-      <version name="1.4" author="ANATOLY TRENEV" time="2026-02-21T16:06:45Z">
-        <source>https://github.com/AnatolyTrenev/JSFX/raw/3bcc73bfeda1b414ccc6b32287941d0e9dd160bb/Trenev/WILDER%201.3%20(beta).txt</source>
+    <reapack name="WILDER.jsfx" type="effect" desc="WILDER">
+      <version name="0.5.0" author="Anatoly Trenev" time="2026-02-21T16:09:03Z">
+        <changelog><![CDATA[beta]]></changelog>
+        <source type="effect">https://github.com/AnatolyTrenev/JSFX/raw/9440e8779f88db2a2927b6c12909e3cb2062062f/Trenev/WILDER.jsfx</source>
       </version>
     </reapack>
   </category>
