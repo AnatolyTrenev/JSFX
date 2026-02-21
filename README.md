@@ -11,7 +11,7 @@ https://raw.githubusercontent.com/AnatolyTrenev/JSFX/master/index.xml
 ## Included plugins
 
 - Creamy Wide
-- Wilder
+- Wilder (comming soon)
 
 ## License
 GPL-3.0-or-later
