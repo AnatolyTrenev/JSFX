@@ -7,6 +7,10 @@ Installation (via ReaPack)
 https://raw.githubusercontent.com/AnatolyTrenev/JSFX/master/index.xml
 
 4. Synchronize packages
+5. Install **Creamy Wide**
+
+The plugin will appear in:
+Effects / Trenev /
 
 ## Included plugins
 
