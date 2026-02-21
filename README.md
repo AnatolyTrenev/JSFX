@@ -17,14 +17,5 @@ Effects / Trenev /
 - Creamy Wide
 - WILDER
 
-## Auto version/index update flow
-
-1. Update the JSFX header fields in the changed plugin:
-   - `version: x.y.z`
-   - `changelog: ...`
-2. Push to `master`.
-3. GitHub Actions runs `reapack-index --commit` and updates `index.xml` automatically.
-4. Updated `index.xml` is pushed back by workflow.
-
 ## License
 GPL-3.0-only
