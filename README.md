@@ -1,23 +1,17 @@
-# ReaPack Repository Template
+Installation (via ReaPack)
 
-A template for GitHub-hosted ReaPack repositories with automated
-[reapack-index](https://github.com/cfillion/reapack-index)
-running from GitHub Actions.
+1. Open REAPER
+2. Extensions → ReaPack → Import repositories
+3. Paste this URL:
 
-Replace the name of the repository in [index.xml](/index.xml) when using this template.
-This will be the name shown in ReaPack.
+https://raw.githubusercontent.com/AnatolyTrenev/JSFX/master/index.xml
 
-```xml
-<index version="1" name="Name of your repository here">
-```
+4. Synchronize packages
 
-Replace the contents of this file ([README.md](/README.md)).
-This will be the text shown when using ReaPack's "About this repository" feature.
+## Included plugins
 
-reapack-index looks for package files in subfolders.
-The folder tree represents the package categories shown in ReaPack.
+- Creamy Wide
+- Wilder
 
-Each package file is expected to begin with a metadata header.
-See [Packaging Documentation](https://github.com/cfillion/reapack-index/wiki/Packaging-Documentation) on reapack-index's wiki.
-
-The URL to import in ReaPack is [https://github.com/AnatolyTrenev/jsfx/raw/master/index.xml](https://github.com/AnatolyTrenev/jsfx/raw/master/index.xml).
+## License
+GPL-3.0-or-later
