@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Trenev" commit="4b95b7a1d3ad194e759fa8f436227125a1a203fb">
+<index version="1" name="Trenev" commit="2130f6ee7c7b22e618e47c57ec4b5e6f3267d5ae">
   <category name="JSFX">
     <reapack name="Creamy Wide.jsfx" type="effect" desc="Creamy Wide">
       <version name="1.0.0" author="Anatoly Trenev" time="2026-02-21T14:54:17Z">
         <changelog><![CDATA[release]]></changelog>
         <source>https://raw.githubusercontent.com/AnatolyTrenev/JSFX/73368a1e80537a061e418ee2e5cecb33970c4f9c/Trenev/Creamy%20Wide.jsfx</source>
+      </version>
+      <version name="1.0.1" author="Trenev" time="2026-02-21T18:25:57Z">
+        <changelog><![CDATA[release]]></changelog>
+        <source>https://github.com/AnatolyTrenev/JSFX/raw/197906920f7765c910a88c00f50534478cc23b36/JSFX/Creamy%20Wide.jsfx</source>
       </version>
     </reapack>
     <reapack name="WILDER.jsfx" type="effect" desc="WILDER">
@@ -12,27 +16,9 @@
         <changelog><![CDATA[beta]]></changelog>
         <source type="effect">https://raw.githubusercontent.com/AnatolyTrenev/JSFX/9440e8779f88db2a2927b6c12909e3cb2062062f/Trenev/WILDER.jsfx</source>
       </version>
-    </reapack>
-  </category>
-  <category name="Trenev">
-    <reapack name="Creamy Wide.jsfx" type="effect" desc="Creamy Wide">
-      <version name="1.0.0" author="Anatoly Trenev" time="2026-02-21T16:18:58Z">
-        <changelog><![CDATA[release]]></changelog>
-        <source>https://github.com/AnatolyTrenev/JSFX/raw/b4650a859b91f72ce0474c5835d4fbe097794f4e/Trenev/Creamy%20Wide.jsfx</source>
-      </version>
-      <version name="1.0.1" author="Trenev" time="2026-02-21T18:02:16Z">
-        <changelog><![CDATA[release]]></changelog>
-        <source>https://github.com/AnatolyTrenev/JSFX/raw/4b95b7a1d3ad194e759fa8f436227125a1a203fb/Trenev/Creamy%20Wide.jsfx</source>
-      </version>
-    </reapack>
-    <reapack name="WILDER.jsfx" type="effect" desc="WILDER">
-      <version name="0.5.0" author="Anatoly Trenev" time="2026-02-21T16:19:17Z">
+      <version name="0.5.1" author="Trenev" time="2026-02-21T18:26:33Z">
         <changelog><![CDATA[beta]]></changelog>
-        <source>https://github.com/AnatolyTrenev/JSFX/raw/bde6f8c32972bd6811ff2061dd15779dfb735045/Trenev/WILDER.jsfx</source>
-      </version>
-      <version name="0.5.1" author="Trenev" time="2026-02-21T18:02:01Z">
-        <changelog><![CDATA[beta]]></changelog>
-        <source>https://github.com/AnatolyTrenev/JSFX/raw/39e12a876fcbe1a9ce26aba462613bd89759a9cc/Trenev/WILDER.jsfx</source>
+        <source>https://github.com/AnatolyTrenev/JSFX/raw/2130f6ee7c7b22e618e47c57ec4b5e6f3267d5ae/JSFX/WILDER.jsfx</source>
       </version>
     </reapack>
   </category>
