@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Trenev" commit="634179da9ed0e630f8ad9ae614efb7c61c2600c5">
+<index version="1" name="Trenev" commit="d5a429f827a3b748167da362189dec368d300bf9">
   <category name="JSFX">
     <reapack name="Creamy Wide.jsfx" type="effect" desc="Creamy Wide">
       <version name="1.0.0" author="Anatoly Trenev" time="2026-02-21T14:54:17Z">
@@ -27,6 +27,10 @@
       <version name="1.0.0" author="Trenev" time="2026-02-21T20:43:40Z">
         <changelog><![CDATA[release]]></changelog>
         <source>https://github.com/AnatolyTrenev/JSFX/raw/220dc1c8d48c93dee6c3c4719c1d1910086704b8/JSFX/WILDER.jsfx</source>
+      </version>
+      <version name="1.0.1" author="Trenev" time="2026-02-22T13:16:50Z">
+        <changelog><![CDATA[release]]></changelog>
+        <source>https://github.com/AnatolyTrenev/JSFX/raw/d5a429f827a3b748167da362189dec368d300bf9/JSFX/WILDER.jsfx</source>
       </version>
     </reapack>
   </category>
