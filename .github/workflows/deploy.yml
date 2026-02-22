@@ -3,7 +3,7 @@ on:
   push:
     branches: [master]
     paths:
-      - "Trenev/**/*.jsfx"
+      - "JSFX/**/*.jsfx"
       - "README.md"
       - ".reapack-index.conf"
       - ".github/workflows/deploy.yml"
