@@ -7,10 +7,10 @@ Installation (via ReaPack)
 https://raw.githubusercontent.com/AnatolyTrenev/JSFX/master/index.xml
 
 4. Synchronize packages
-5. Go to Browser and type **Trenev**
 
-## Included plugins
+5. Go to Browser packages and type **Trenev**
 
+6. Install plugins
 - Creamy Wide
 - WILDER
   
