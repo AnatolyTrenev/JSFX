@@ -2,14 +2,14 @@ name: check
 on:
   push:
     paths:
-      - "Trenev/**/*.jsfx"
+      - "JSFX/**/*.jsfx"
       - "README.md"
       - ".reapack-index.conf"
       - ".github/workflows/check.yml"
       - ".github/workflows/deploy.yml"
   pull_request:
     paths:
-      - "Trenev/**/*.jsfx"
+      - "JSFX/**/*.jsfx"
       - "README.md"
       - ".reapack-index.conf"
       - ".github/workflows/check.yml"
