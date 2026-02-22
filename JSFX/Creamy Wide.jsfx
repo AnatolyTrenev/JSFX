@@ -1314,7 +1314,7 @@ function draw_about_overlay() (
    
    msg_l1 = "Source: https://github.com/AnatolyTrenev/Creamy-Wide";
    msg_l2 = "Copyright (c) 2026 Anatoly Trenev";
-   msg_l3 = "SPDX-License-Identifier: GPL-3.0-or-later";
+   msg_l3 = "SPDX-License-Identifier: GPL-3.0-only";
    msg_qr1 = "If you like this plugin,";
    msg_qr2 = "support the project via QR code.";
    msg3 = "Telegram: @trenev";
