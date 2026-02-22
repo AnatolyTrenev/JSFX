@@ -7,15 +7,15 @@ Installation (via ReaPack)
 https://raw.githubusercontent.com/AnatolyTrenev/JSFX/master/index.xml
 
 4. Synchronize packages
-5. Install **Creamy Wide**
-
-The plugin will appear in:
-Effects / Trenev /
+5. Go to Browser and type **Trenev**
 
 ## Included plugins
 
 - Creamy Wide
 - WILDER
+  
+The plugin will appear in:
+Effects / Trenev / JSFX
 
 ## License
 GPL-3.0-only
