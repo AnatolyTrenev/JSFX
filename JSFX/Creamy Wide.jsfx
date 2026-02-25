@@ -1,6 +1,6 @@
-version: 1.0.21
+version: 1.0.22
 desc:Creamy Wide
-author:Trenev
+author:Anatoly Trenev
 changelog:release
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright (c) 2026 Anatoly Trenev
@@ -48,6 +48,7 @@ slider28:0<0,2,1>-Sat Even Drive Mode (Hidden)
 slider29:0<0,2,1>-Sat Odd Drive Mode (Hidden)
 slider30:1<0,1,1>-Tooltips (Hidden)
 slider31:0<0,1,1>-Comp ON (Hidden)
+slider32:0<0,1,1>-Area Mono Solo (Hidden)
 
 @init
 ext_noinit = 1.0; 
@@ -62,12 +63,12 @@ buf_l == 0 ? (
   buf_l = 0; buf_r = MAX_DELAY + 1000;
   dpan_buf_l = buf_r + MAX_DELAY + 1000; dpan_buf_r = dpan_buf_l + 4000; 
   vis_mem_l = 200000; vis_mem_r = 200000 + vis_size + 100;
+  vis_gain_mem = vis_mem_r + vis_size + 100;
   write_pos = 0; dpan_write = 0; ph_l = 0; 
   vis_idx = 0;
 );
 
 draw_corr = 0; 
-scope_mode = 1; // 1 = stereoscope, 0 = classic vectorscope
 show_about = 0; // About box state
 scope_wid_mem = 520000;
 scope_pan_mem = 520100;
@@ -90,6 +91,8 @@ init_blink_start = -10;
 mm_prev_val = 200;
 mm_enabled = 1;
 comp_gain = 1;
+vec_norm_gain = 1;
+vec_rms2_env = 0.000001;
 
 // Init Filter states
 hp_x1_l=0; hp_x2_l=0; hp_y1_l=0; hp_y2_l=0;
@@ -105,17 +108,21 @@ slp_x1_r=0; slp_x2_r=0; slp_y1_r=0; slp_y2_r=0;
 
 // Mono Maker
 mm_x1=0; mm_x2=0; mm_y1=0; mm_y2=0;
+mm2_x1=0; mm2_x2=0; mm2_y1=0; mm2_y2=0;
 
 // DC Blocker & Sat
 dc_l = 0; dc_r = 0;
 last_spl0 = 0; last_spl1 = 0;
 last_area_solo = 0;
+last_mono_solo = 0;
 dc_l_solo = 0; dc_r_solo = 0;
 last_sol_spl0 = 0; last_sol_spl1 = 0;
 
 // Solo buffers
 solo_buf_l = 0; solo_buf_r = 0; solo_write_pos = 0;
 solo_l_l_in = 0; solo_l_l_out = 0; solo_l_r_in = 0; solo_l_r_out = 0;
+mm_solo_lp_x1 = 0; mm_solo_lp_x2 = 0; mm_solo_lp_y1 = 0; mm_solo_lp_y2 = 0;
+mm_solo_lp2_x1 = 0; mm_solo_lp2_x2 = 0; mm_solo_lp2_y1 = 0; mm_solo_lp2_y2 = 0;
 
 // --- QR DATA INITIALIZATION ---
 qr_size = 29;
@@ -202,6 +209,10 @@ w0_mm = 2 * $pi * f_mono / srate;
 cos_w_mm = cos(w0_mm); alpha_mm = sin(w0_mm) / sqrt(2); a0_mm = 1 + alpha_mm;
 mm_a1 = (-2 * cos_w_mm) / a0_mm; mm_a2 = (1 - alpha_mm) / a0_mm;
 mm_b0 = ((1 + cos_w_mm) / 2) / a0_mm; mm_b1 = -(1 + cos_w_mm) / a0_mm; mm_b2 = mm_b0;
+// Mono solo audition filter (low-pass below MonoMaker frequency)
+a0_mm_lp = 1 + alpha_mm;
+mm_lp_a1 = (-2 * cos_w_mm) / a0_mm_lp; mm_lp_a2 = (1 - alpha_mm) / a0_mm_lp;
+mm_lp_b0 = ((1 - cos_w_mm) / 2) / a0_mm_lp; mm_lp_b1 = (1 - cos_w_mm) / a0_mm_lp; mm_lp_b2 = mm_lp_b0;
 
 output_gain = 10 ^ (slider6 / 20);
 
@@ -286,22 +297,26 @@ comp_a = exp(-1/(0.0001 * srate)); // 0.1 ms attack
 comp_r = exp(-1/(1.7 * srate));    // 1700 ms release
 
 solo_buf_l == 0 ? (
-  solo_buf_l = vis_mem_r + vis_size + 100;
+  solo_buf_l = vis_gain_mem + vis_size + 100;
   solo_buf_r = solo_buf_l + MAX_DELAY + 1000;
   solo_write_pos = 0;
   solo_l_l_in = 0; solo_l_l_out = 0; solo_l_r_in = 0; solo_l_r_out = 0;
 );
 
 area_solo = slider19;
+mono_area_solo = slider32;
 
-area_solo != last_area_solo ? (
+(area_solo != last_area_solo) || (mono_area_solo != last_mono_solo) ? (
   shp_x1_l=0; shp_x2_l=0; shp_y1_l=0; shp_y2_l=0;
   shp_x1_r=0; shp_x2_r=0; shp_y1_r=0; shp_y2_r=0;
   slp_x1_l=0; slp_x2_l=0; slp_y1_l=0; slp_y2_l=0;
   slp_x1_r=0; slp_x2_r=0; slp_y1_r=0; slp_y2_r=0;
   dc_l_solo = 0; dc_r_solo = 0;
   last_sol_spl0 = 0; last_sol_spl1 = 0;
+  mm_solo_lp_x1 = 0; mm_solo_lp_x2 = 0; mm_solo_lp_y1 = 0; mm_solo_lp_y2 = 0;
+  mm_solo_lp2_x1 = 0; mm_solo_lp2_x2 = 0; mm_solo_lp2_y1 = 0; mm_solo_lp2_y2 = 0;
   last_area_solo = area_solo;
+  last_mono_solo = mono_area_solo;
 );
 
 @sample
@@ -316,81 +331,114 @@ dry_l = in_l; dry_r = in_r;
 // --- GLOBAL BYPASS CHECK ---
 global_on == 0 ? (
     spl0 = dry_l; spl1 = dry_r;
-    vis_mem_l[vis_idx] = spl0; vis_mem_r[vis_idx] = spl1; vis_idx = (vis_idx + 1) % vis_size; 
+    vec_in_rms2 = 0.5 * (spl0*spl0 + spl1*spl1);
+    vec_in_rms2 > vec_rms2_env ? (
+      vec_rms2_env += (vec_in_rms2 - vec_rms2_env) * 0.09; // attack
+    ) : (
+      vec_rms2_env += (vec_in_rms2 - vec_rms2_env) * 0.025; // release
+    );
+    vec_in_rms = sqrt(max(vec_rms2_env, 0.000001));
+    vec_target_rms = 0.26;
+    vec_target_gain = vec_target_rms / max(vec_in_rms, 0.000001);
+    vec_target_gain = max(1.0, min(4.0, vec_target_gain));
+    vec_target_gain > vec_norm_gain ? (
+      vec_norm_gain += (vec_target_gain - vec_norm_gain) * 0.12;
+    ) : (
+      vec_norm_gain += (vec_target_gain - vec_norm_gain) * 0.03;
+    );
+    vis_mem_l[vis_idx] = spl0;
+    vis_mem_r[vis_idx] = spl1;
+    vis_gain_mem[vis_idx] = vec_norm_gain;
+    vis_idx = (vis_idx + 1) % vis_size; 
 ) : (
 
-    area_solo ? (
+    (area_solo || mono_area_solo) ? (
        // --- AREA SOLO CHAIN (Audition Mode) ---
        sol_l = dry_l; sol_r = dry_r;
+       area_solo ? (
+          // Blue S active: audition through Area filter bounds.
+          s_out_l = hp_b0*sol_l + hp_b1*shp_x1_l + hp_b2*shp_x2_l - hp_a1*shp_y1_l - hp_a2*shp_y2_l;
+          shp_x2_l = shp_x1_l; shp_x1_l = sol_l; shp_y2_l = shp_y1_l; shp_y1_l = s_out_l; sol_l = s_out_l;
+          s_out_r = hp_b0*sol_r + hp_b1*shp_x1_r + hp_b2*shp_x2_r - hp_a1*shp_y1_r - hp_a2*shp_y2_r;
+          shp_x2_r = shp_x1_r; shp_x1_r = sol_r; shp_y2_r = shp_y1_r; shp_y1_r = s_out_r; sol_r = s_out_r;
+          
+          s_out_l = lp_b0*sol_l + lp_b1*slp_x1_l + lp_b2*slp_x2_l - lp_a1*slp_y1_l - lp_a2*slp_y2_l;
+          slp_x2_l = slp_x1_l; slp_x1_l = sol_l; slp_y2_l = slp_y1_l; slp_y1_l = s_out_l; sol_l = s_out_l;
+          s_out_r = lp_b0*sol_r + lp_b1*slp_x1_r + lp_b2*slp_x2_r - lp_a1*slp_y1_r - lp_a2*slp_y2_r;
+          slp_x2_r = slp_x1_r; slp_x1_r = sol_r; slp_y2_r = slp_y1_r; slp_y1_r = s_out_r; sol_r = s_out_r;
+       );
        
-       s_out_l = hp_b0*sol_l + hp_b1*shp_x1_l + hp_b2*shp_x2_l - hp_a1*shp_y1_l - hp_a2*shp_y2_l;
-       shp_x2_l = shp_x1_l; shp_x1_l = sol_l; shp_y2_l = shp_y1_l; shp_y1_l = s_out_l; sol_l = s_out_l;
-       s_out_r = hp_b0*sol_r + hp_b1*shp_x1_r + hp_b2*shp_x2_r - hp_a1*shp_y1_r - hp_a2*shp_y2_r;
-       shp_x2_r = shp_x1_r; shp_x1_r = sol_r; shp_y2_r = shp_y1_r; shp_y1_r = s_out_r; sol_r = s_out_r;
-       
-       s_out_l = lp_b0*sol_l + lp_b1*slp_x1_l + lp_b2*slp_x2_l - lp_a1*slp_y1_l - lp_a2*slp_y2_l;
-       slp_x2_l = slp_x1_l; slp_x1_l = sol_l; slp_y2_l = slp_y1_l; slp_y1_l = s_out_l; sol_l = s_out_l;
-       s_out_r = lp_b0*sol_r + lp_b1*slp_x1_r + lp_b2*slp_x2_r - lp_a1*slp_y1_r - lp_a2*slp_y2_r;
-       slp_x2_r = slp_x1_r; slp_x1_r = sol_r; slp_y2_r = slp_y1_r; slp_y1_r = s_out_r; sol_r = s_out_r;
-       
-       // Process Solo Signal...
-       solo_mono = (sol_l + sol_r) * 0.5;
-       solo_buf_l[solo_write_pos] = solo_mono; solo_buf_r[solo_write_pos] = solo_mono;
-       mod_l = sin(ph_l) * depth_samps; mod_r = cos(ph_l) * depth_samps; 
-       ph_l += d_phase; ph_l > 628.0 ? ( ph_l -= 628.0; );
-       
-       w_l = read_cubic_solo(solo_buf_l, b_samp_l + mod_l, solo_write_pos); 
-       w_r = read_cubic_solo(solo_buf_r, b_samp_r + mod_r, solo_write_pos);
-       f_l = a0_lp*w_l + a1_lp*solo_l_l_in - b1_lp*solo_l_l_out; solo_l_l_in = w_l; solo_l_l_out = f_l;
-       f_r = a0_lp*w_r + a1_lp*solo_l_r_in - b1_lp*solo_l_r_out; solo_l_r_in = w_r; solo_l_r_out = f_r;
-       eff_l = f_l; eff_r = f_r - (f_l * 0.5); 
-       eff_l *= creamy_amt; eff_r *= creamy_amt;
-       sol_l = sol_l + eff_l; sol_r = sol_r + eff_r;
-       solo_write_pos = (solo_write_pos + 1) % MAX_DELAY;
-       
-       v_l_in = sol_l; v_r_in = sol_r;
-       sol_l = (v_l_in + v_r_in * v_cross) * v_comp; sol_r = (v_r_in + v_l_in * v_cross) * v_comp; 
-       
-       // [FIXED] MS Solo
-       mid = (sol_l + sol_r) * 0.5;
-       side = (sol_l - sol_r) * 0.5;
-       mid *= ms_mid_g;
-       side *= ms_side_g;
-       sol_l = mid + side; sol_r = mid - side;
+       mono_area_solo ? (
+          // Solo only the MonoMaker-affected range: below MonoMaker frequency.
+          mono_sol = (sol_l + sol_r) * 0.5;
+          mono_lp = mm_lp_b0*mono_sol + mm_lp_b1*mm_solo_lp_x1 + mm_lp_b2*mm_solo_lp_x2 - mm_lp_a1*mm_solo_lp_y1 - mm_lp_a2*mm_solo_lp_y2;
+          mm_solo_lp_x2 = mm_solo_lp_x1; mm_solo_lp_x1 = mono_sol;
+          mm_solo_lp_y2 = mm_solo_lp_y1; mm_solo_lp_y1 = mono_lp;
+          mono_lp2 = mm_lp_b0*mono_lp + mm_lp_b1*mm_solo_lp2_x1 + mm_lp_b2*mm_solo_lp2_x2 - mm_lp_a1*mm_solo_lp2_y1 - mm_lp_a2*mm_solo_lp2_y2;
+          mm_solo_lp2_x2 = mm_solo_lp2_x1; mm_solo_lp2_x1 = mono_lp;
+          mm_solo_lp2_y2 = mm_solo_lp2_y1; mm_solo_lp2_y1 = mono_lp2;
+          mono_lp2 *= 1.68; // mono solo make-up gain
+          spl0 = mono_lp2; spl1 = mono_lp2;
+       ) : (
+          // Process Solo Signal...
+          solo_mono = (sol_l + sol_r) * 0.5;
+          solo_buf_l[solo_write_pos] = solo_mono; solo_buf_r[solo_write_pos] = solo_mono;
+          mod_l = sin(ph_l) * depth_samps; mod_r = cos(ph_l) * depth_samps; 
+          ph_l += d_phase; ph_l > 628.0 ? ( ph_l -= 628.0; );
+          
+          w_l = read_cubic_solo(solo_buf_l, b_samp_l + mod_l, solo_write_pos); 
+          w_r = read_cubic_solo(solo_buf_r, b_samp_r + mod_r, solo_write_pos);
+          f_l = a0_lp*w_l + a1_lp*solo_l_l_in - b1_lp*solo_l_l_out; solo_l_l_in = w_l; solo_l_l_out = f_l;
+          f_r = a0_lp*w_r + a1_lp*solo_l_r_in - b1_lp*solo_l_r_out; solo_l_r_in = w_r; solo_l_r_out = f_r;
+          eff_l = f_l; eff_r = f_r - (f_l * 0.5); 
+          eff_l *= creamy_amt; eff_r *= creamy_amt;
+          sol_l = sol_l + eff_l; sol_r = sol_r + eff_r;
+          solo_write_pos = (solo_write_pos + 1) % MAX_DELAY;
+          
+          v_l_in = sol_l; v_r_in = sol_r;
+          sol_l = (v_l_in + v_r_in * v_cross) * v_comp; sol_r = (v_r_in + v_l_in * v_cross) * v_comp; 
+          
+          // [FIXED] MS Solo
+          mid = (sol_l + sol_r) * 0.5;
+          side = (sol_l - sol_r) * 0.5;
+          mid *= ms_mid_g;
+          side *= ms_side_g;
+          sol_l = mid + side; sol_r = mid - side;
 
-       p_even > 0 ? (
-          drive_e = p_even * 0.5;
-          s_in_l = sol_l * e_gain_in; s_in_r = sol_r * e_gain_in;
+          p_even > 0 ? (
+             drive_e = p_even * 0.5;
+             s_in_l = sol_l * e_gain_in; s_in_r = sol_r * e_gain_in;
+             
+             h2_l = s_in_l * s_in_l; h2_r = s_in_r * s_in_r;
+             h4_l = h2_l * h2_l; h4_r = h2_r * h2_r;
+             h6_l = h4_l * h2_l; h6_r = h4_r * h2_r;
+             
+             added_l = drive_e * (0.7*h2_l + 0.2*h4_l + 0.1*h6_l);
+             added_r = drive_e * (0.7*h2_r + 0.2*h4_r + 0.1*h6_r);
+             
+             sol_l = sol_l + added_l * e_gain_comp;
+             sol_r = sol_r + added_r * e_gain_comp;
+             
+             dc_l_solo = sol_l - last_sol_spl0 + 0.997 * dc_l_solo; last_sol_spl0 = sol_l; sol_l = dc_l_solo;
+             dc_r_solo = sol_r - last_sol_spl1 + 0.997 * dc_r_solo; last_sol_spl1 = sol_r; sol_r = dc_r_solo;
+          );
+          p_odd > 0 ? (
+             drive_o = 1.0 + p_odd * 2.5; 
+             s_in_l = sol_l * o_gain_in; s_in_r = sol_r * o_gain_in;
+             
+             sol_l = (2/$pi) * atan(s_in_l * drive_o); 
+             sol_r = (2/$pi) * atan(s_in_r * drive_o);
+             
+             p_odd < 0.3 ? ( vol_comp = 1.57 - (p_odd / 0.3) * 0.57; ) : ( vol_comp = 1.0 - ((p_odd - 0.3) / 0.7) * 0.293; );
+             sol_l *= vol_comp; sol_r *= vol_comp;
+             
+             sol_l *= o_gain_comp; sol_r *= o_gain_comp;
+          );
           
-          h2_l = s_in_l * s_in_l; h2_r = s_in_r * s_in_r;
-          h4_l = h2_l * h2_l; h4_r = h2_r * h2_r;
-          h6_l = h4_l * h2_l; h6_r = h4_r * h2_r;
-          
-          added_l = drive_e * (0.7*h2_l + 0.2*h4_l + 0.1*h6_l);
-          added_r = drive_e * (0.7*h2_r + 0.2*h4_r + 0.1*h6_r);
-          
-          sol_l = sol_l + added_l * e_gain_comp;
-          sol_r = sol_r + added_r * e_gain_comp;
-          
-          dc_l_solo = sol_l - last_sol_spl0 + 0.997 * dc_l_solo; last_sol_spl0 = sol_l; sol_l = dc_l_solo;
-          dc_r_solo = sol_r - last_sol_spl1 + 0.997 * dc_r_solo; last_sol_spl1 = sol_r; sol_r = dc_r_solo;
+          wet_l = dry_l + (sol_l - dry_l) * global_mix;
+          wet_r = dry_r + (sol_r - dry_r) * global_mix;
+          spl0 = wet_l; spl1 = wet_r;
        );
-       p_odd > 0 ? (
-          drive_o = 1.0 + p_odd * 2.5; 
-          s_in_l = sol_l * o_gain_in; s_in_r = sol_r * o_gain_in;
-          
-          sol_l = (2/$pi) * atan(s_in_l * drive_o); 
-          sol_r = (2/$pi) * atan(s_in_r * drive_o);
-          
-          p_odd < 0.3 ? ( vol_comp = 1.57 - (p_odd / 0.3) * 0.57; ) : ( vol_comp = 1.0 - ((p_odd - 0.3) / 0.7) * 0.293; );
-          sol_l *= vol_comp; sol_r *= vol_comp;
-          
-          sol_l *= o_gain_comp; sol_r *= o_gain_comp;
-       );
-       
-       wet_l = dry_l + (sol_l - dry_l) * global_mix;
-       wet_r = dry_r + (sol_r - dry_r) * global_mix;
-       spl0 = wet_l; spl1 = wet_r;
     ) : (
        // --- MAIN CHAIN ---
        band_l = in_l; band_r = in_r;
@@ -473,7 +521,9 @@ global_on == 0 ? (
        mid_s = (spl0 + spl1) * 0.5; side_s = (spl0 - spl1) * 0.5;
        side_filt = mm_b0*side_s + mm_b1*mm_x1 + mm_b2*mm_x2 - mm_a1*mm_y1 - mm_a2*mm_y2;
        mm_x2 = mm_x1; mm_x1 = side_s; mm_y2 = mm_y1; mm_y1 = side_filt;
-       spl0 = mid_s + side_filt; spl1 = mid_s - side_filt;
+       side_filt2 = mm_b0*side_filt + mm_b1*mm2_x1 + mm_b2*mm2_x2 - mm_a1*mm2_y1 - mm_a2*mm2_y2;
+       mm2_x2 = mm2_x1; mm2_x1 = side_filt; mm2_y2 = mm2_y1; mm2_y1 = side_filt2;
+       spl0 = mid_s + side_filt2; spl1 = mid_s - side_filt2;
     );
 
     haas_active ? (
@@ -519,8 +569,24 @@ global_on == 0 ? (
     );
 
     // Stereoscope measures the final output signal (post-Out, post-ceiling).
+    vec_in_rms2 = 0.5 * (spl0*spl0 + spl1*spl1);
+    vec_in_rms2 > vec_rms2_env ? (
+      vec_rms2_env += (vec_in_rms2 - vec_rms2_env) * 0.09; // attack
+    ) : (
+      vec_rms2_env += (vec_in_rms2 - vec_rms2_env) * 0.025; // release
+    );
+    vec_in_rms = sqrt(max(vec_rms2_env, 0.000001));
+    vec_target_rms = 0.26;
+    vec_target_gain = vec_target_rms / max(vec_in_rms, 0.000001);
+    vec_target_gain = max(1.0, min(4.0, vec_target_gain));
+    vec_target_gain > vec_norm_gain ? (
+      vec_norm_gain += (vec_target_gain - vec_norm_gain) * 0.12;
+    ) : (
+      vec_norm_gain += (vec_target_gain - vec_norm_gain) * 0.03;
+    );
     vis_mem_l[vis_idx] = spl0;
     vis_mem_r[vis_idx] = spl1;
+    vis_gain_mem[vis_idx] = vec_norm_gain;
     vis_idx = (vis_idx + 1) % vis_size;
 );
 
@@ -1054,28 +1120,59 @@ function draw_sat_slider(id_even, id_odd, x, y, w, h, active_even_id, active_odd
   gfx_setfont(1, ui_font_name, ui_font_m);
 );
 
-function draw_area_solo_btn(id, x, y, w, h, area_active_id) (
+function draw_area_solo_btn(id, other_id, x, y, w, h, area_active_id, is_mono_solo) (
   state = slider(id);
   is_area_on = slider(area_active_id);
   
   hover = (mouse_x >= x && mouse_x <= x+w && mouse_y >= y && mouse_y <= y+h);
-  set_tooltip(hover, "S: solo selected Area range.");
+  is_mono_solo ? (
+    set_tooltip(hover, "M: solo filtered signal in mono.");
+  ) : (
+    set_tooltip(hover, "S: solo selected Area range.");
+  );
   
   global_enabled ? (
       mouse_click && hover && (drag_id == -1) ? (
-         slider(id) = !slider(id); slider_automate(1<< (id-1)); drag_id = -2; 
+         new_state = !slider(id);
+         slider(id) = new_state;
+         slider_automate(1<< (id-1));
+         drag_id = -2; 
       );
   );
   rect_y = y - 2;
   
-  // If Area is OFF, button is dim regardless of state
-  (state && is_area_on) ? col_cyan() : (hover && global_enabled ? col_hover_btn_neutral() : col_dim());
+  state && is_area_on ? (
+    is_mono_solo ? col_orange() : col_cyan();
+    darken_color_15();
+  ) : (
+    hover && global_enabled ? (
+      col_hover_btn_neutral();
+    ) : (
+      // Keep slight tint when inactive to preserve module color identity.
+      is_mono_solo ? col_orange() : col_cyan();
+      darken_color_15();
+      gfx_a *= 0.45;
+    );
+  );
   
   gfx_rect(x, rect_y, w, 1); gfx_rect(x, rect_y+h-1, w, 1); gfx_rect(x, rect_y, 1, h); gfx_rect(x+w-1, rect_y, 1, h);   
   
-  (state && is_area_on) ? col_cyan() : (hover && global_enabled ? col_hover_btn_neutral() : col_dim());
+  state && is_area_on ? (
+    is_mono_solo ? col_orange() : col_cyan();
+    darken_color_15();
+  ) : (
+    hover && global_enabled ? (
+      col_hover_btn_neutral();
+    ) : (
+      is_mono_solo ? col_orange() : col_cyan();
+      darken_color_15();
+      gfx_a *= 0.45;
+    );
+  );
   
-  gfx_setfont(1, ui_font_name, ui_font_b); gfx_measurestr("S", tw, th); gfx_x = x + (w - tw)*0.5; gfx_y = y + (h - th)*0.5 - 1; gfx_drawstr("S");
+  gfx_setfont(1, ui_font_name, ui_font_b);
+  sprintf(btn_lbl, "S");
+  gfx_measurestr(btn_lbl, tw, th); gfx_x = x + (w - tw)*0.5; gfx_y = y + (h - th)*0.5 - 1; gfx_drawstr(btn_lbl);
   gfx_setfont(1, ui_font_name, ui_font_m);
 );
 
@@ -1222,7 +1319,7 @@ function draw_text_btn(id, x, y, w, h, label, is_toggle) (
              slider6=0; slider7=0; slider8=0; slider9=100; slider10=0;
              slider11=0; slider12=0; slider14=0; slider15=0; slider16=0;
              slider20=1; slider21=1; slider22=1; slider23=1; slider24=1; slider25=1; slider26=1;
-             slider27=20; slider28=0; slider29=0; slider31=0;
+             slider27=20; slider28=0; slider29=0; slider31=0; slider32=0;
              init_blink_start = time_precise();
              drag_id = -2;
         );
@@ -1314,7 +1411,7 @@ function draw_about_overlay() (
    
    msg_l1 = "Source: https://github.com/AnatolyTrenev/Creamy-Wide";
    msg_l2 = "Copyright (c) 2026 Anatoly Trenev";
-   msg_l3 = "SPDX-License-Identifier: GPL-3.0-only";
+   msg_l3 = "SPDX-License-Identifier: GPL-3.0-or-later";
    msg_qr1 = "If you like this plugin,";
    msg_qr2 = "support the project via QR code.";
    msg3 = "Telegram: @trenev";
@@ -1410,7 +1507,13 @@ function draw_about_overlay() (
 margin_x = 45;
 margin_y = 30; sl_w = 20; sl_h = 240; gap = 45;
 draw_dual_slider(4, 5, 27, margin_x, margin_y, sl_w, sl_h, "Area", 20); 
-draw_area_solo_btn(19, margin_x, margin_y + sl_h + 13, sl_w, 18, 20); 
+solo_btn_y = margin_y + sl_h + 13;
+solo_btn_w = 18;
+solo_btn_h = 18;
+solo_btn_mono_x = margin_x + sl_w*(-0.08) - solo_btn_w*0.5;
+solo_btn_area_x = margin_x + sl_w*(1.08) - solo_btn_w*0.5;
+draw_area_solo_btn(32, 19, solo_btn_mono_x, solo_btn_y, solo_btn_w, solo_btn_h, 20, 1);
+draw_area_solo_btn(19, 32, solo_btn_area_x, solo_btn_y, solo_btn_w, solo_btn_h, 20, 0); 
 
 draw_v_slider(1, margin_x + sl_w + gap, margin_y, sl_w, sl_h, "Creamy", 0, 100, 0, 0, 21);
 draw_v_slider(2, margin_x + (sl_w + gap)*2, margin_y, sl_w, sl_h, "Vitality", -100, 100, 1, 1, 22);
@@ -1431,7 +1534,7 @@ scale = scope_h * 0.95;
 // Start of sliders below
 y_stack_start = cy + 25; 
 
-scope_mode ? (
+(
   y_top = cy - scale;
   y_bot = cy;
   x_center = cx;
@@ -1484,6 +1587,22 @@ scope_mode ? (
       );
       band_mask = max(0, min(1, min(lo_mask, hi_mask)));
       band_mask = 1 - mix_scope + mix_scope * band_mask;
+    );
+    // Mono-S solo view: strictly show only below MonoMaker frequency.
+    mono_area_solo ? (
+      mm_hi = max(20, slider27);
+      mm_hi_tr = 1.01; // very narrow transition for strict visual cutoff
+      mm_hi_mul = pow(2, mm_hi_tr/12);
+      mono_hi_mask = 1;
+      f >= mm_hi ? (
+        mono_hi_mask = 0;
+      ) : (
+        f > mm_hi / mm_hi_mul ? (
+          mono_hi_mask = log(mm_hi / f) / log(mm_hi_mul);
+        );
+      );
+      mono_hi_mask = max(0, min(1, mono_hi_mask));
+      band_mask *= mono_hi_mask;
     );
 
     w = 2 * $pi * f / srate;
@@ -1609,47 +1728,11 @@ scope_mode ? (
   btn_sz = 18;
   draw_phase_square_btn(11, cx - scale - 2 - btn_sz, cy - 8, btn_sz, btn_sz, "L");
   draw_phase_square_btn(12, cx + scale + 4, cy - 8, btn_sz, btn_sz, "R");
-) : (
-  col_dim(); gfx_a=0.65;
-  gfx_line(cx, cy - scale, cx, cy); // vertical line (same style as stereoscope)
-  col_dim(); gfx_a=1.0;
-  gfx_line(scope_x, cy, scope_x + scope_w, cy); // baseline length matches stereoscope
-
-  btn_sz = 18;
-  draw_phase_square_btn(11, cx - scale - 2 - btn_sz, cy - 8, btn_sz, btn_sz, "L");
-  draw_phase_square_btn(12, cx + scale + 4, cy - 8, btn_sz, btn_sz, "R");
-
-  gfx_mode = 1; 
-  vec_gain = 1.0; // classic vectorscope scale
-  k = 0;
-  while (k < vis_size) (
-    i = vis_idx - 1 - k;
-    i < 0 ? i += vis_size;
-    l = vis_mem_l[i]; r = vis_mem_r[i]; 
-    l_draw = l * 0.5 * vec_gain;
-    r_draw = r * 0.5 * vec_gain;
-    is_clipping = (abs(l) > 1) || (abs(r) > 1);
-    dx = (r_draw - l_draw) * scale;
-    dy = -(l_draw + r_draw) * scale;
-    x = cx + dx;
-    y = cy + dy;
-    (x >= cx - scale && x <= cx + scale && y >= cy - scale && y <= cy) ? (
-      is_clipping ? col_red() : col_cyan();
-      fade = 1 - (k / vis_size);
-      gfx_a = 0.12 + 0.7 * fade;
-      gfx_x = x; gfx_y = y; gfx_setpixel(gfx_r, gfx_g, gfx_b);
-    );
-    k += 2; 
-  );
 );
 
-// Click inside scope area toggles stereoscope/vectorscope.
+// Scope area (stereoscope only).
 scope_hit = (mouse_x >= scope_x && mouse_x <= scope_x + scope_w && mouse_y >= cy - scale && mouse_y <= cy);
-set_tooltip(scope_hit, "Click scope to toggle Frequency Stereo Analyzer/Vectorscope.");
-mouse_click && scope_hit && drag_id == -1 ? (
-  scope_mode = !scope_mode;
-  drag_id = -2;
-);
+set_tooltip(scope_hit, "Frequency Stereo Analyzer.");
 
 sum_xy = 0; sum_sq_x = 0; sum_sq_y = 0; i = 0;
 while (i < vis_size) (
@@ -1727,7 +1810,7 @@ set_tooltip(tip_hover, slider30 > 0.5 ? "Tooltips: ON." : "Tooltips: OFF.");
 // Title & About Trigger
 gfx_setfont(1, ui_font_name, ui_font_t);
 col_white(); gfx_a = 1;
-title_str = "Creamy Wide 1.0.0";
+title_str = "Creamy Wide 1.0.22";
 gfx_measurestr(title_str, sw, sh);
 title_x = gfx_w - sw - 10;
 title_y = footer_y + (footer_h - sh) * 0.5;
